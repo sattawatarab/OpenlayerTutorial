@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+    <title>One day shaing - Open Layer Workshop</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.3.1/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.3.1/build/ol.js"></script>
+</head>
+<body>
+    <div id="fullscreen" class="fullscreen">
+        <div id="map" class="map">
+			<div class="dropdown">
+				<button onclick="myFunction()" class="dropbtn"></button>
+				<div id="myDropdown" class="dropdown-content">
+					<a href="javascript:void(0)" data-style="Aerial" onclick="changeBaseMap(this)">Aerial</a>
+					<a href="javascript:void(0)" data-style="AerialWithLabels" onclick="changeBaseMap(this)">Aerial with labels</a>
+					<a href="javascript:void(0)" data-style="Road" onclick="changeBaseMap(this)">Aerial Road</a>
+					<a href="javascript:void(0)" data-style="OSM" onclick="changeBaseMap(this)">OSM</a>
+				</div>
+			</div>			
+		</div
+        <div class="sidepanel">
+            <span class="sidepanel-title">Map overlay</span>
+            <div class="form">
+                <label class="switch pull-left">
+                    <input type="checkbox" name="ne" value="wmsLayerchonburi" class="checkbox" onchange="showMapLayer(this);" id="wms1">
+                    <span class="slider round"></span>
+                </label>
+                <span class="layer-name">Administrative boundary</span>
+				<div>&nbsp;</div>
+                <label class="switch pull-left">
+                    <input type="checkbox" name="amphoe" value="wmsLayerchonburi" class="checkbox" onchange="showMapLayer(this);">
+                    <span class="slider round"></span>
+                </label>
+                <span class="layer-name">จังหวัดชลบุรี</span>
+				<div>&nbsp;</div>
+                <label class="switch pull-left">
+                    <input type="checkbox" name="dam" value="wmsLayerDam" class="checkbox" onchange="showMapLayer(this);">
+                    <span class="slider round"></span>
+                </label>
+                <span class="layer-name">Dam</span>
+				<div>&nbsp;</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="map.js"></script>
+</body>
+
+</html>
