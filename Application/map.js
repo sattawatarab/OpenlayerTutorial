@@ -1,130 +1,185 @@
-var wmsSourceAmphoe = new ol.source.ImageWMS({
-    url: 'http://localhost/geoserver/test/wms',
+var wmsSource = new ol.source.ImageWMS({
+    url: 'https://ahocevar.com/geoserver/wms',
     params: {
-        'LAYERS': 'test:WaterSource'
+        'LAYERS': 'ne:ne'
     },
-    crossOrigin: 'anonymous'
 });
 
-var wmsLayerchonburi = new ol.layer.Image({
+var wmsLayerAdmin = new ol.layer.Image({
+    source: wmsSource
+});
+
+var wmsSourceTambon = new ol.source.ImageWMS({
+    url: 'http://192.168.1.33:8079/geoserver/SmallWaterArea/wms',
+    params: {
+        'LAYERS': 'SmallWaterArea:Landuse'
+    },
+});
+
+var wmsLayerTambon = new ol.layer.Image({
+    source: wmsSourceTambon
+});
+
+var wmsSourceAmphoe = new ol.source.ImageWMS({
+    url: 'http://localhost:8082/geoserver/sattwat/wms?',
+    params: {
+        'LAYERS': 'sattwat:Amphoe2554'
+    },
+});
+
+var wmsLayerAmphoe = new ol.layer.Image({
     source: wmsSourceAmphoe
 });
 
 var wmsSourceDam = new ol.source.ImageWMS({
-    url: 'http://localhost/geoserver/test/wms',
+    url: 'http://localhost:8080/geoserver/training/wms',
     params: {
-        'LAYERS': 'test:Dam'
+        'LAYERS': '	training:Dam'
     },
-    crossOrigin: 'anonymous'
 });
 
 var wmsLayerDam = new ol.layer.Image({
     source: wmsSourceDam
 });
 
-// osm tile
-var OSM = new ol.layer.Tile({
-	visible: true,
-	source: new ol.source.OSM()
+var view = new ol.View({
+    center: ol.proj.fromLonLat([100.4833, 13.7500]),
+    zoom: 6
+});
+  
+var layers = [new ol.layer.Tile({
+    source: new ol.source.OSM()
+})];
+
+var container = document.getElementById('popup');
+var content = document.getElementById('popup-content');
+var closer = document.getElementById('popup-closer');
+var overlay = new ol.Overlay({
+	element: container,
+	autoPan: true,
+	autoPanAnimation: {
+	  duration: 250
+	}
 });
 
-// init map
-var map = new ol.Map({
+closer.onclick = function() {
+	overlay.setPosition(undefined);
+	closer.blur();
+	content.innerHTML = '';
+	return false;
+};
+
+var map = new ol.Map({	
     controls: ol.control.defaults().extend([
         new ol.control.FullScreen({
             source: 'fullscreen'
-        }),
-		new ol.control.ScaleLine({
-			units: 'metric'
-		})
+        })
     ]),
-    layers: [OSM],
+	overlays: [overlay],
+    layers: layers,
     target: 'map',
-    view: new ol.View({
-		center: ol.proj.fromLonLat([100.4833, 13.7500]),
-		zoom: 6
-	})
+    view: view
 });
 
-// layer toggle
 function showMapLayer(el) {
     checkedLayer = window[el.value];
 
     if (el.checked) {
+        layers.push(checkedLayer);
         map.addLayer(checkedLayer);
     } else {
+        var index = layers.indexOf(checkedLayer);
+        layers.splice(index, 1);
         map.removeLayer(checkedLayer);
     }
 }
 
-// bing base map
-var bingKey = 'As1HiMj1PvLPlqc_gtM7AqZfBL8ZL3VrjaS3zIb22Uvb9WKhuJObROC-qUpa81U5';
-var Aerial = new ol.layer.Tile({
-	preload: Infinity,
-	source: new ol.source.BingMaps({
-		key: bingKey,
-		imagerySet: 'Aerial'
-	})
-});
-
-var AerialWithLabels = new ol.layer.Tile({
-	preload: Infinity,
-	source: new ol.source.BingMaps({
-		key: bingKey,
-		imagerySet: 'AerialWithLabels'
-	})
-});
-
-var Road = new ol.layer.Tile({
-	preload: Infinity,
-	source: new ol.source.BingMaps({
-		key: bingKey,
-		imagerySet: 'Road'
-	})
-});
-
-// base map func
-function changeBaseMap(el){
-	var style = el.dataset.style;
-	if(style){
-		map.getLayers().removeAt(0);
-		switch(style){
-			case 'OSM':
-				map.getLayers().insertAt(0, OSM);
-				break;
-			case 'Aerial':
-				map.getLayers().insertAt(0, Aerial);
-				break;
-			case 'AerialWithLabels':
-				map.getLayers().insertAt(0, AerialWithLabels);
-				break;
-			case 'Road':
-				map.getLayers().insertAt(0, Road);
-			break;		
-				default:
-			  break;		
-		}
+map.on('singleclick', function(evt) {
+	var coordinate = evt.coordinate;
+	//document.getElementById('info').innerHTML = '';
+	var viewResolution = /** @type {number} */ (view.getResolution());
+	var url = wmsSourceTambon.getGetFeatureInfoUrl(
+		evt.coordinate, viewResolution, 'EPSG:3857',
+		{'INFO_FORMAT': 'application/json'});
+	if (url) {
+	  /* document.getElementById('info').innerHTML = '<iframe id="info-iframe" src="' + url + '"></iframe>'; */
+	  //console.log(url)
+	  fetch(url)
+	  .then(function(response) {
+		return response.json();
+	  })
+	  .then(function(response) {
+		//console.log(myJson);
+		var temp = response.features[0];
+        var features = temp.properties;
+		var resHtml = '';
+		
+		if(temp){
+			resHtml += '<table class="table table-hover">';
+			for(prop in features){
+				resHtml += '<tr>';
+				resHtml += '<td> ' + prop +' </td>';
+				resHtml += '<td> ' + features[prop] +' </td>';
+				resHtml += '<tr>';
+			}
+			
+			resHtml += '</table>';
+			content.innerHTML = resHtml;
+			overlay.setPosition(coordinate);
+		}else{
+			closer.click();
+		}		
+	  });
 	}	
+});
+
+/* map.on('pointermove', function(evt) {
+	if (evt.dragging) {
+	  return;
+	}
+	var pixel = map.getEventPixel(evt.originalEvent);
+	var hit = map.forEachLayerAtPixel(pixel, function() {
+	  return true;
+	});
+	map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+}); */
+
+document.getElementById('export-png').addEventListener('click', function() {
+        map.once('postcompose', function(event) {
+          var canvas = event.context.canvas;
+          if (navigator.msSaveBlob) {
+            navigator.msSaveBlob(canvas.msToBlob(), 'map.png');
+          } else {
+            canvas.toBlob(function(blob) {
+              saveAs(blob, 'map.png');
+            });
+          }
+        });
+        map.renderSync();
+      });
+
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on the button, open the modal
+btn.onclick = function() {
+    modal.style.display = "block";
 }
 
-// base map dropdown menu
-/* When the user clicks on the button, 
-toggle between hiding and showing the dropdown content */
-function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
 }
 
-// Close the dropdown menu if the user clicks outside of it
+// When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn')) {
-
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
+    if (event.target == modal) {
+        modal.style.display = "none";
     }
-  }
-}
+} 

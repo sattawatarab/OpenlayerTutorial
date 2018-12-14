@@ -11,7 +11,6 @@ body {
     overflow-x: hidden;
     padding: 0;
     margin: 0;
-	height: 100%;
 }
 
 .fullscreen:-moz-full-screen {
@@ -143,53 +142,124 @@ input:checked+.slider:before {
     margin-left: 10px;
 }
 
-/* Dropdown Button */
-.dropbtn {
-    background-color: #3498DB;
-    border: none;
-    cursor: pointer;
-    padding: 5px 5px 0 5px;
-	border-radius: 2px;
+/* Popup */
+.ol-popup {
+	position: absolute;
+	background-color: white;
+	-webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+	padding: 15px;
+	border-radius: 10px;
+	border: 1px solid #cccccc;
+	bottom: 12px;
+	left: -50px;
+	min-width: 280px;
 }
-.dropbtn::before{
-	content: url('layer-icon.png');
+.ol-popup:after, .ol-popup:before {
+	top: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+.ol-popup:after {
+	border-top-color: white;
+	border-width: 10px;
+	left: 48px;
+	margin-left: -10px;
+}
+.ol-popup:before {
+	border-top-color: #cccccc;
+	border-width: 11px;
+	left: 48px;
+	margin-left: -11px;
+}
+.ol-popup-closer {
+	text-decoration: none;
+	position: absolute;
+	top: 2px;
+	right: 8px;
+}
+.ol-popup-closer:after {
+	content: "X";
+	text-decoration: none;
+}
+#popup-content{
+	font-size: 11px;
 }
 
-/* Dropdown button on hover & focus */
-.dropbtn:hover, .dropbtn:focus {
-    background-color: #1F6B75;
+ /* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-/* The container <div> - needed to position the dropdown content */
-.dropdown {
-    position: absolute;
-	top: 45px;
-	right: 10px;
-	z-index: 1;
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
 }
 
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-	right: 0;
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
 }
 
-/* Links inside the dropdown */
-.dropdown-content a {
+.close:hover,
+.close:focus {
     color: black;
-    padding: 12px 16px;
     text-decoration: none;
-    display: block;
-    font-size: 14px;
+    cursor: pointer;
 }
 
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd}
 
-/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
+.tooltip {
+        position: relative;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+        color: white;
+        padding: 4px 8px;
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+.tooltip-measure {
+        opacity: 1;
+        font-weight: bold;
+      }
+ .tooltip-static {
+        background-color: #ffcc33;
+        color: black;
+        border: 1px solid white;
+      }
+.tooltip-measure:before,
+ .tooltip-static:before {
+        border-top: 6px solid rgba(0, 0, 0, 0.5);
+        border-right: 6px solid transparent;
+        border-left: 6px solid transparent;
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        margin-left: -7px;
+        left: 50%;
+      }
+.tooltip-static:before {
+        border-top-color: #ffcc33;
+      }    
+
+
